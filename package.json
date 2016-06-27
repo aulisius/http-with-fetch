@@ -1,5 +1,5 @@
 {
-  "name": "http-fetch",
+  "name": "http-with-fetch",
   "version": "0.1.0",
   "private": false,
   "main": "http.js",
