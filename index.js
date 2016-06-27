@@ -16,9 +16,7 @@ ptype.get = (url, type = 'json', ...interceptors) => http.method(url, type, 'GET
 ptype.post = (url, data, type = 'json', ...interceptors) => http.method(url, type, 'POST', http.add('body', data), ...interceptors) 
 
 ptype.method = function(url, type, method, ...interceptors) {
-    let target = ''
-    if(this.base.trim().length === 0) target += this.base 
-    target += url
+    const target = this.base + url
 
     const options = this._interceptors.concat(interceptors, http.add('method', method)).reduce((options, interceptor) => interceptor(options), {})
 
