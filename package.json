@@ -1,11 +1,11 @@
 {
   "name": "http-with-fetch",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": false,
   "main": "index.js",
   "author": {
-      "name": "N. Md Faizaan",
-      "email": "aulisius7@gmail.com"
+    "name": "N. Md Faizaan",
+    "email": "aulisius7@gmail.com"
   },
   "bugs": "https://github.com/faizaanceg/http-with-fetch/issues",
   "description": "A tiny abstraction over fetch",
@@ -16,6 +16,6 @@
     "http"
   ],
   "scripts": {
-      "build": "webpack"
+    "build": "webpack"
   }
 }
