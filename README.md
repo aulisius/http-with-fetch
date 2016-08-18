@@ -13,16 +13,13 @@ npm i http-with-fetch --save
 
 ##Usage
 
-With `require`
-
-```
-let http = require('http-with-fetch')
-```
+Intended to be used as a ES6 module
 
 With ES6
 
 ```
 import http from 'http-with-fetch'
+let service = new http('/resource')
 ```
 
 ##Motivation
@@ -62,7 +59,7 @@ fetch('/resource3', {
 fetch('/resource4', options)
 ```
 
-This problem increases when each `fetch` does some common things but also its own specific stuff.
+This problem increases when each `fetch` does some common things and also its own specific stuff.
 
 With `http-with-fetch` it can be rewritten as,
 
@@ -75,12 +72,7 @@ http.get('/resource1')
 
 http.get('/resource2')
 
-http.post('/resource3', JSON.stringify(data), options => {
-    options['headers'] = {
-        'content-type': 'application/json'
-    }
-    return options
-})
+http.post('/resource3', JSON.stringify(data), http.add('headers', {'content-type': 'application/json'}))
 
 http.get('/resource4')
 ```

@@ -1,26 +1,41 @@
-let http = Object.create(Function), ptype = http.prototype
+export default class http {
+    constructor(base = '') {
+        this.base = base
+        this.interceptors = []
 
-ptype.base = ''
+        this.use = this.use.bind(this)
+        this.add = this.add.bind(this)
+        this.get = this.get.bind(this)
+        this.post = this.post.bind(this)
+        this.method = this.method.bind(this)
+    }
 
-ptype._interceptors = []
+    use(interceptor) {
+        this.interceptors.push(interceptor)
+    }
 
-ptype.add = (key, val) => options => {
-        options[key] = val
-        return options
+    add(key, val) {
+        return (opts) => {
+            opts[key] = val
+            return opts
+        }
+    }
+
+    get(url, type = 'json', ...interceptors) {
+        return this.method(url, type, 'GET', ...interceptors)
+    }
+
+    post(url, data, type = 'json', ...interceptors) {
+        return this.method(url, type, 'POST', this.add('body', data), ...interceptors)
+    }
+
+    method(url, type, method, ...interceptors) {
+        const target = this.base + url
+
+        const opts = this.interceptors
+            .concat(interceptors, this.add('method', method))
+            .reduce((opts, interceptor) => interceptor(opts), {})
+
+        return fetch(target, opts).then(response => response[type]())
+    }
 }
-
-ptype.use = interceptor => http._interceptors.push(interceptor)
-
-ptype.get = (url, type = 'json', ...interceptors) => http.method(url, type, 'GET', ...interceptors) 
-
-ptype.post = (url, data, type = 'json', ...interceptors) => http.method(url, type, 'POST', http.add('body', data), ...interceptors) 
-
-ptype.method = function(url, type, method, ...interceptors) {
-    const target = this.base + url
-
-    const options = this._interceptors.concat(interceptors, http.add('method', method)).reduce((options, interceptor) => interceptor(options), {})
-
-    return fetch(target, options).then(res => res[type]())
-}
-
-module.exports = http
