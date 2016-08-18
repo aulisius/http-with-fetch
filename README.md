@@ -1,28 +1,26 @@
-#http-with-fetch
+# http-with-fetch
 A tiny abstraction over the `fetch` API.
 
-##Description
+## Description
 
-`http-with-fetch` provides an easier way to write APIs using `fetch`
+`http-with-fetch` provides an easier way to write APIs using `fetch`.
 
-##Installation
+## Installation
 
 ```
 npm i http-with-fetch --save
 ```
 
-##Usage
+## Usage
 
-Intended to be used as a ES6 module
-
-With ES6
+Intended to be used as a ES6 module.
 
 ```
 import http from 'http-with-fetch'
 let service = new http('/resource')
 ```
 
-##Motivation
+## Motivation
 Consider the following code
 ```
 let options = { mode: 'cors' }
