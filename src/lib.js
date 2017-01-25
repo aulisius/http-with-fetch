@@ -1,13 +1,15 @@
 class http {
-  constructor (base = '', fetch) {
+  constructor(base = '', fetch) {
     let _base = base
     this.interceptors = []
-    this.fetch = fetch
+    if (self && self.fetch) {
+      this.fetch = self.fetch
+    }
     this.base = () => _base
 
-		if (!fetch) {
-			throw new Error('Fetch unavailable. Please polyfill fetch to use')
-		}
+    if (!(this.fetch)) {
+      throw new Error('Fetch unavailable. Please polyfill fetch to use')
+    }
   }
 
   use = (interceptor) => this.interceptors.push(interceptor)
@@ -29,10 +31,9 @@ class http {
     const valid = ['arrayBuffer', 'blob', 'formData', 'json', 'text'].indexOf(type) !== -1
 
     return valid
-    ? this.fetch(target, opts).then(response => response[type]())
-    : this.fetch(target, opts)
+      ? this.fetch(target, opts).then(response => response[type]())
+      : this.fetch(target, opts)
   }
 }
 
 module.exports = http
-
