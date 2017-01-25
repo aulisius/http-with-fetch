@@ -1,10 +1,13 @@
-import Fetch from 'fetch-ponyfill'
-export default class http {
-  constructor (base = '') {
+class http {
+  constructor (base = '', fetch) {
     let _base = base
     this.interceptors = []
-    this.fetch = Fetch().fetch
+    this.fetch = fetch
     this.base = () => _base
+
+		if (!fetch) {
+			throw new Error('Fetch unavailable. Please polyfill fetch to use')
+		}
   }
 
   use = (interceptor) => this.interceptors.push(interceptor)
@@ -30,3 +33,6 @@ export default class http {
     : this.fetch(target, opts)
   }
 }
+
+module.exports = http
+
