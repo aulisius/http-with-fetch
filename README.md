@@ -9,12 +9,11 @@ A tiny abstraction over the `fetch` API.
 
 ```
 npm i http-with-fetch --save
-bower install http-with-fetch
 ```
 
 ## Note
 
-This library uses the native `fetch` if supported. You can also pass a `fetch` polyfill if you are using this in an environment where native `fetch` isn't supported (for ex. node, old browsers)
+This library uses the native `fetch` if supported. You can pass a `fetch` polyfill if you are using this in an environment where native `fetch` isn't supported (for ex. node, old browsers)
 
 ## Usage
 
