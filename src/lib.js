@@ -1,15 +1,15 @@
 class http {
   constructor(base = '', fetch) {
-    let _base = base
-    this.interceptors = []
     if (self && self.fetch) {
       this.fetch = self.fetch
-    }
+    } else if (fetch) {
+			this.fetch = fetch
+		} else {
+			throw new Error('Fetch not supported. Provide a fetch polyfill to use')
+		}
+    let _base = base
+    this.interceptors = []
     this.base = () => _base
-
-    if (!(this.fetch)) {
-      throw new Error('Fetch unavailable. Please polyfill fetch to use')
-    }
   }
 
   use = (interceptor) => this.interceptors.push(interceptor)
