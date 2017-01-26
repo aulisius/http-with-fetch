@@ -16,7 +16,8 @@
     "http"
   ],
   "scripts": {
-    "build": "webpack"
+    "build": "webpack",
+		"prepublish": "webpack"
   },
   "devDependencies": {
     "babel-core": "^6.22.1",
