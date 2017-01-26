@@ -1,6 +1,6 @@
 class http {
   constructor(base = '', fetch) {
-    if (self && self.fetch) {
+    if (typeof self !== 'undefined' && self.fetch) {
       this.fetch = self.fetch
     } else if (fetch) {
 			this.fetch = fetch
