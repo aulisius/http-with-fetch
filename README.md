@@ -1,5 +1,5 @@
 # http-with-fetch
-A tiny abstraction over the `fetch` API.
+A tiny (1 kb) abstraction over the `fetch` API.
 
 ## Description
 
@@ -86,14 +86,14 @@ http.get('point4')
 
 # API
 
-## constructor(base: String, fetch: Fetch?)
+## HTTP(base: String, fetch: Fetch?)
 
 Creates a new object.
 
-| Arguments | Description |
-|---|---|
-| base | The base url of the resource. |
-| fetch | A Fetch polyfill. Only needed if the environment doesn't support `fetch` by default.|
+| Arguments | Description                                                                          |
+| --------- | ------------------------------------------------------------------------------------ |
+| base      | The base url of the resource.                                                        |
+| fetch     | A Fetch polyfill. Only needed if the environment doesn't support `fetch` by default. |
 
 ## add(key: String, val: String | Object)
 
@@ -107,12 +107,12 @@ Adds an common interceptor. All requests will be intercepted by this.
 
 Make a request.
 
-| Arguments | Description |
-|---|---|
-| url | The url of the resource (relative to the base URL) |
-| type | The response type. Can be one of `['json', 'text', 'formData', 'blob', 'arrayBuffer', 'none']`. Default is `json` |
-| verb  | HTTP method to use. Uppercase only. |
-| interceptors  | Interceptors specific to this request. |
+| Arguments    | Description                                                                                                       |
+| ------------ | ----------------------------------------------------------------------------------------------------------------- |
+| url          | The url of the resource (relative to the base URL)                                                                |
+| type         | The response type. Can be one of `['json', 'text', 'formData', 'blob', 'arrayBuffer', 'none']`. Default is `json` |
+| verb         | HTTP method to use. Uppercase only.                                                                               |
+| interceptors | Interceptors specific to this request.                                                                            |
 
 ## get(url: String, type: String, ...interceptors: Function[])
 
@@ -122,6 +122,6 @@ An alias for `method` with `verb=GET`
 
 An alias for `method` with `verb=POST`
 
-| Arguments | Description |
-|---|---|
-| data | The body of the POST request |
+| Arguments | Description                  |
+| --------- | ---------------------------- |
+| data      | The body of the POST request |
