@@ -1,5 +1,5 @@
 # http-with-fetch
-A tiny (1 kb) abstraction over the `fetch` API.
+A tiny (< 1 kb) abstraction over building complex wrappers over the `fetch` API.
 
 ## Description
 
@@ -7,27 +7,23 @@ A tiny (1 kb) abstraction over the `fetch` API.
 
 ## Installation
 
+```sh
+npm i http-with-fetch
 ```
-npm i http-with-fetch --save
-```
-
-## Note
-
-This library uses the native `fetch` if supported. You can pass a `fetch` polyfill if you are using this in an environment where native `fetch` isn't supported (for ex. node, old browsers)
 
 ## Usage
 
 Intended to be used as a ES6 module ( `import` ) or using `require`.
 
-```
-import HTTP from 'http-with-fetch'
-let userService = new HTTP('/users', some-fetch-polyfill)
+```js
+import { HTTP } from 'http-with-fetch'
+let userService = new HTTP('/users')
 ```
 
 ## Motivation
 
 Consider the following code
-```
+```js
 let options = { mode: 'cors' }
 
 fetch('/resource/point1', options)
@@ -41,7 +37,7 @@ fetch('/resource/point4', options)
 
 If you were to do a POST at `/resource/point3`, then you can't reuse `options` in the fetch call and the code would then become
 
-```
+```js
 let options = { mode: 'cors' }
 
 let data = { 'some': 'data' }
@@ -66,8 +62,8 @@ This problem increases when each `fetch` does some common things and also its ow
 
 With `http-with-fetch` it can be rewritten as,
 
-```
-const HTTP = require('http-with-fetch')
+```js
+const { HTTP } = require('http-with-fetch')
 
 let http = new HTTP('/resource/')
 
@@ -79,49 +75,42 @@ http.get('point1')
 
 http.get('point2')
 
-http.post('point3', JSON.stringify(data), http.add('headers', {'content-type': 'application/json'}))
+http.method('point3', "POST",
+  http.add('body', JSON.stringify(data)),
+  http.add('headers', {'content-type': 'application/json'})
+)
 
 http.get('point4')
 ```
 
 # API
 
-## HTTP(base: String, fetch: Fetch?)
+## HTTP(base?: string)
 
 Creates a new object.
 
-| Arguments | Description                                                                          |
-| --------- | ------------------------------------------------------------------------------------ |
-| base      | The base url of the resource.                                                        |
-| fetch     | A Fetch polyfill. Only needed if the environment doesn't support `fetch` by default. |
+| Arguments | Description                   |
+| --------- | ----------------------------- |
+| base      | The base url of the resource. Default is `""` |
 
-## add(key: String, val: String | Object)
+## add(key: string, value: string | Record<string, string>)
 
 Helper method to create interceptors.
 
-## use(interceptor: Function)
+## use(interceptor: function)
 
 Adds an common interceptor. All requests will be intercepted by this.
 
-## method(url: String, type: String, verb: String, ...interceptors: Function[])
+## method(url: string, method: string, ...interceptors?: function[])
 
 Make a request.
 
-| Arguments    | Description                                                                                                       |
-| ------------ | ----------------------------------------------------------------------------------------------------------------- |
-| url          | The url of the resource (relative to the base URL)                                                                |
-| type         | The response type. Can be one of `['json', 'text', 'formData', 'blob', 'arrayBuffer', 'none']`. Default is `json` |
-| verb         | HTTP method to use. Uppercase only.                                                                               |
-| interceptors | Interceptors specific to this request.                                                                            |
+| Arguments    | Description                                        |
+| ------------ | -------------------------------------------------- |
+| url          | The url of the resource (relative to the base URL) |
+| method       | HTTP method to use. Uppercase only.                |
+| interceptors | Interceptors specific to this request.             |
 
-## get(url: String, type: String, ...interceptors: Function[])
+## get(url: string, ...interceptors?: function[])
 
 An alias for `method` with `verb=GET`
-
-## post(url: String, data: Body, type: String, ...interceptors: Function[])
-
-An alias for `method` with `verb=POST`
-
-| Arguments | Description                  |
-| --------- | ---------------------------- |
-| data      | The body of the POST request |
