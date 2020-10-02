@@ -4,14 +4,7 @@ let add = (key, val) => opts =>
       typeof val === "string" ? val : Object.assign({}, opts[key] || {}, val)
   });
 
-function getFetch() {
-  if (window && window.fetch) {
-    return window.fetch;
-  }
-  throw new Error("Fetch not found");
-}
-
-function HTTP(base, fetch = getFetch()) {
+export function HTTP(base = "") {
   globalFns = [];
   this.add = add;
 
@@ -34,9 +27,7 @@ function HTTP(base, fetch = getFetch()) {
     );
 
     return valid
-      ? fetch(target, opts).then(response => response[type]())
-      : fetch(target, opts);
+      ? window.fetch(target, opts).then(response => response[type]())
+      : window.fetch(target, opts);
   };
 }
-
-export default HTTP;
