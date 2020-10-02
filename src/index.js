@@ -12,9 +12,6 @@ export function HTTP(base = "") {
 
   this.get = (url, ...fns) => this.method(url, "GET", ...fns);
 
-  this.post = (url, data, ...fns) =>
-    this.method(url, "POST", add("body", data), ...fns);
-
   this.method = (url, method, ...fns) => {
     let opts = globalFns
       .concat(fns, add("method", method))
