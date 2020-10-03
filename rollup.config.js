@@ -1,11 +1,11 @@
 import filesize from "rollup-plugin-filesize";
 import pkg from "./package.json";
 
-let createBuild = ({ format }) => ({
+let createBuild = (format, file) => ({
   input: pkg.source,
-  external: Object.keys(pkg.peerDependencies || {}),
-  output: { file: `lib/${format}.js`, format },
+  external: Object.keys(pkg.peerDependencies),
+  output: { file, format },
   plugins: [filesize()]
 });
 
-export default [createBuild({ format: "cjs" }), createBuild({ format: "es" })];
+export default [createBuild("cjs", pkg.main), createBuild("es", pkg.module)];
