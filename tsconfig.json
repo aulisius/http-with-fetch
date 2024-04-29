@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "module": "ESNext",
+    "target": "ES2022",
+    "declaration": true,
+    "outDir": "./lib"
+  },
+  "include": ["src/*"]
+}
