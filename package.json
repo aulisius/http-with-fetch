@@ -1,7 +1,7 @@
 {
   "name": "http-with-fetch",
-  "version": "3.0.0",
-  "module": "lib/client.mts",
+  "version": "3.0.1",
+  "module": "lib/client.mjs",
   "source": "src/client.mts",
   "author": {
     "name": "N. Md Faizaan",
