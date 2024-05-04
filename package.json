@@ -10,7 +10,10 @@
   "bugs": "https://github.com/aulisius/http-with-fetch/issues",
   "description": "A tiny abstraction over fetch",
   "license": "MIT",
-  "repository": "https://github.com/aulisius/http-with-fetch",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aulisius/http-with-fetch.git"
+  },
   "keywords": [
     "fetch",
     "http"
