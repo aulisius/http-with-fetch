@@ -1,22 +1,24 @@
 type Query = Record<string, any>;
 type Body = URLSearchParams | FormData | Query;
 
-type ApiResponse<T, Safe extends boolean> = Promise<
+type Result<T, Safe extends boolean> = Promise<
   Safe extends true ? [T, Error] : T
 >;
 
+export type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
+
 interface Client<Safe extends boolean> {
   call<T>(
-    method: string,
+    method: HttpMethod,
     url: string,
     qs?: Query,
     body?: Body
-  ): ApiResponse<T, Safe>;
-  get<T>(url: string, qs?: Query, body?: Body): ApiResponse<T, Safe>;
-  post<T>(url: string, qs?: Query, body?: Body): ApiResponse<T, Safe>;
-  delete<T>(url: string, qs?: Query, body?: Body): ApiResponse<T, Safe>;
-  postBody<T>(url: string, body: Body): ApiResponse<T, Safe>;
-  put<T>(url: string, body: Body): ApiResponse<T, Safe>;
+  ): Result<T, Safe>;
+  get<T>(url: string, qs?: Query, body?: Body): Result<T, Safe>;
+  post<T>(url: string, qs?: Query, body?: Body): Result<T, Safe>;
+  delete<T>(url: string, qs?: Query, body?: Body): Result<T, Safe>;
+  postBody<T>(url: string, body: Body): Result<T, Safe>;
+  put<T>(url: string, body: Body): Result<T, Safe>;
 }
 
 export interface Visitor {
@@ -24,13 +26,15 @@ export interface Visitor {
   fail: <T>(request: Request, response: Response) => Promise<T>;
 }
 
+type WithCredentials = { init: RequestInit; url: string };
+
 export interface CredentialsManager {
-  applyRefresh: () => Promise<boolean>;
+  refresh: () => Promise<void>;
   isValid: (req: Request, res: Response) => Promise<boolean>;
   attach: (
     init: RequestInit,
     url?: string
-  ) => RequestInit | Promise<RequestInit>;
+  ) => WithCredentials | Promise<WithCredentials>;
 }
 
 type ClientFactory = { visitor: Visitor; credentials: CredentialsManager };
@@ -39,7 +43,7 @@ export function addQueryParamsToUrl(
   url: string,
   queryParams: Query = {}
 ): string {
-  const parsedUrl = new URL(url, globalThis.location.origin);
+  const parsedUrl = new URL(url, globalThis.location?.origin);
   url = url.replace(parsedUrl.search, "");
   let search = parsedUrl.searchParams;
   for (const [key, values] of Object.entries(queryParams)) {
@@ -64,56 +68,63 @@ function createRequestInit(method: string, body: Body): RequestInit {
   return init;
 }
 
+async function unwrap<T, Safe extends boolean>(
+  cb: () => Promise<T>,
+  safe: Safe
+): Result<T, Safe> {
+  try {
+    let ok = await cb();
+    // @ts-ignore
+    return safe ? [ok, null] : ok;
+  } catch (cause) {
+    let error = new Error(cause.message, { cause });
+    if (safe) {
+      // @ts-ignore
+      return [null as T, error] as const;
+    }
+    throw error;
+  }
+}
+
+async function execute(credentials: WithCredentials) {
+  let request = new Request(credentials.url, credentials.init);
+  let response = await fetch(request);
+  return [request, response] as const;
+}
+
 export function createApiClient<Safe extends boolean>(
   factory: ClientFactory,
   safe: Safe
 ): Client<Safe> {
   const { visitor, credentials } = factory;
-  async function unwrap<T>(cb: () => Promise<T>): Promise<T | [T, Error]> {
-    try {
-      let ok = await cb();
-      return safe ? [ok, null] : ok;
-    } catch (cause) {
-      let error = new Error(cause.message, { cause });
-      error.name = "CallFailed";
-      if (safe) {
-        return [null, error];
-      } else {
-        throw error;
-      }
-    }
-  }
   async function call<T>(
-    method: string,
+    method: HttpMethod,
     url: string,
     qs: Query = {},
     body: Body
   ) {
-    const init = createRequestInit(method, body);
-    const fullUrl = addQueryParamsToUrl(url, qs);
-    let updatedInit = await credentials.attach({ ...init }, fullUrl);
-    let request = new Request(fullUrl, updatedInit);
-    let response = await fetch(request);
+    let init = createRequestInit(method, body);
+    let withQs = addQueryParamsToUrl(url, qs);
+    let [request, response] = await execute(
+      await credentials.attach({ ...init }, withQs)
+    );
     if (response.ok) {
-      return unwrap<T>(() => visitor.ok(response));
+      return unwrap(() => visitor.ok(response), safe);
     }
     let isValid = await credentials.isValid(request, response);
     if (!isValid) {
-      let isComplete = await credentials.applyRefresh();
-      if (!isComplete) {
-        let err = new Error("RefreshFailed");
-        if (safe) {
-          return [null, err];
-        }
-        throw err;
+      let refresh = await unwrap(() => credentials.refresh(), safe);
+      if (safe) {
+        return refresh;
       }
-      let updatedInit = await credentials.attach({ ...init }, fullUrl);
-      response = await fetch(new Request(fullUrl, updatedInit));
+      [request, response] = await execute(
+        await credentials.attach({ ...init }, withQs)
+      );
       if (response.ok) {
-        return unwrap<T>(() => visitor.ok(response));
+        return unwrap(() => visitor.ok(response), safe);
       }
     }
-    return unwrap<T>(() => visitor.fail<T>(request, response));
+    return unwrap(() => visitor.fail(request, response), safe);
   }
   return {
     call,
