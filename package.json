@@ -1,6 +1,6 @@
 {
   "name": "http-with-fetch",
-  "version": "3.1.0",
+  "version": "3.2.0",
   "module": "lib/client.mjs",
   "source": "src/client.mts",
   "author": {
@@ -23,13 +23,14 @@
     "prebuild": "rimraf lib",
     "build": "tsc",
     "dev": "tsc -w",
+    "test": "node test.mjs",
     "prepare": "npm run build"
   },
   "peerDependencies": {},
   "devDependencies": {
-    "prettier": "3.2.5",
-    "rimraf": "5.0.5",
-    "typescript": "5.4.5"
+    "prettier": "3.3.3",
+    "rimraf": "6.0.1",
+    "typescript": "5.5.4"
   },
   "files": [
     "lib/**",
