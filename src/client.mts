@@ -55,13 +55,17 @@ export function addQueryParamsToUrl(
   return qs.length === 0 ? url : `${url}?${qs}`;
 }
 
-function createRequestInit(method: string, body: Body): RequestInit {
-  let init: Partial<RequestInit> = { method };
+function createRequestInit(
+  method: string,
+  body: Body,
+  headers: Headers | Record<string, string>
+): RequestInit {
+  let init: Partial<RequestInit> = { method, headers };
   if (body?.constructor?.name !== "Object") {
     init.body = body as Exclude<Body, Query>;
     return init;
   }
-  init.headers = { "content-type": "application/json" };
+  init.headers["content-type"] = "application/json";
   if (body) {
     init.body = JSON.stringify(body);
   }
@@ -101,9 +105,10 @@ export function createApiClient<Safe extends boolean>(
     method: HttpMethod,
     url: string,
     qs: Query = {},
-    body: Body
+    body: Body,
+    headers: Headers | Record<string, string> = {}
   ) {
-    let init = createRequestInit(method, body);
+    let init = createRequestInit(method, body, headers);
     let withQs = addQueryParamsToUrl(url, qs);
     let [request, response] = await execute(
       await credentials.attach({ ...init }, withQs)

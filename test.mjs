@@ -1,7 +1,7 @@
-import { createApiClient } from "./lib/client.mjs";
-import { createServer } from "node:http";
 import assert from "node:assert";
-import { it, describe } from "node:test";
+import { createServer } from "node:http";
+import { describe, it } from "node:test";
+import { createApiClient } from "./lib/client.mjs";
 
 class DefaultCredentialsManager {
   async attach(init, url) {
@@ -27,7 +27,14 @@ const safe = createApiClient({ credentials, visitor }, true);
 const server = createServer((req, res) => {
   let url = new URL(req.url, `http://${req.headers.host}`);
   let status = url.searchParams.get("status") ?? 200;
-  let body = { message: url.searchParams.get("message") ?? "" };
+  let headers;
+  for (let [name, value] of Object.entries(req.headers)) {
+    if (name.startsWith("x-")) {
+      headers ??= {};
+      headers[name] = value;
+    }
+  }
+  let body = { message: url.searchParams.get("message") ?? "", headers };
   res.writeHead(Number(status), { "Content-Type": "application/json" });
   res.end(JSON.stringify(body));
 });
@@ -72,6 +79,22 @@ await describe("api client", { concurrency: false }, async () => {
       assert.ok(err);
       assert.ifError(res);
       assert.deepStrictEqual(err.cause, { message: "Bad Request" });
+    });
+  });
+
+  it("when using .call", async (t) => {
+    await t.test("can pass custom headers", async () => {
+      let hello = await unsafe.call(
+        "GET",
+        "http://localhost:8080/",
+        { status: 200, message: "Hello World!" },
+        null,
+        { "x-custom-header": "value" }
+      );
+      assert.deepStrictEqual(hello, {
+        message: "Hello World!",
+        headers: { "x-custom-header": "value" },
+      });
     });
   });
 });
