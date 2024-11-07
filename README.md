@@ -1,6 +1,7 @@
 # http-with-fetch
+<a href="https://pkg-size.dev/http-with-fetch"><img src="https://pkg-size.dev/badge/bundle/1213" title="Bundle size for http-with-fetch"></a>
 
-A tiny (< 1 kb) abstraction over building complex wrappers over the `fetch` API.
+A tiny abstraction over building featureful wrappers over the `fetch` API.
 
 ## Installation
 
@@ -16,7 +17,7 @@ import { CredentialsManager, createApiClient } from "http-with-fetch";
 class DefaultCredentialsManager implements CredentialsManager {
   async attach(init: RequestInit, url: string) {
     init.credentials = "include";
-    return init;
+    return { init, url };
   }
   async isValid(_: Request, res: Response) {
     if (res.status === 401) {
