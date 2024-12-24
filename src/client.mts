@@ -61,7 +61,7 @@ function createRequestInit(
   headers: Headers | Record<string, string>
 ): RequestInit {
   let init: Partial<RequestInit> = { method, headers };
-  if (body?.constructor?.name !== "Object") {
+  if (body?.constructor?.name !== "Object" && !Array.isArray(body)) {
     init.body = body as Exclude<Body, Query>;
     return init;
   }

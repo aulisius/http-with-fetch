@@ -23,7 +23,7 @@
     "prebuild": "rimraf lib",
     "build": "tsc",
     "dev": "tsc -w",
-    "test": "node test.mjs",
+    "test": "node --experimental-test-coverage --test test.mjs",
     "prepare": "npm run build"
   },
   "peerDependencies": {},

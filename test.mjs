@@ -24,19 +24,43 @@ const visitor = {
 const unsafe = createApiClient({ credentials, visitor }, false);
 const safe = createApiClient({ credentials, visitor }, true);
 
+function tryParse(maybeJson) {
+  try {
+    return JSON.parse(maybeJson);
+  } catch (error) {
+    return maybeJson;
+  }
+}
+
 const server = createServer((req, res) => {
   let url = new URL(req.url, `http://${req.headers.host}`);
   let status = url.searchParams.get("status") ?? 200;
   let headers;
   for (let [name, value] of Object.entries(req.headers)) {
-    if (name.startsWith("x-")) {
+    if (name.startsWith("x-") || name.startsWith("content")) {
       headers ??= {};
       headers[name] = value;
     }
   }
-  let body = { message: url.searchParams.get("message") ?? "", headers };
-  res.writeHead(Number(status), { "Content-Type": "application/json" });
-  res.end(JSON.stringify(body));
+  let buf = [];
+  req.on("readable", () => {
+    let chunk;
+    while (null !== (chunk = req.read())) {
+      buf.push(chunk.toString("utf-8"));
+    }
+  });
+  req.on("end", () => {
+    let payload = buf.join("");
+    let body = {
+      message: url.searchParams.get("message") ?? "",
+      headers,
+    };
+    if (payload) {
+      body.body = tryParse(payload);
+    }
+    res.writeHead(Number(status), { "Content-Type": "application/json" });
+    res.end(JSON.stringify(body));
+  });
 });
 
 await new Promise((res) => server.listen(8080, res));
@@ -95,6 +119,47 @@ await describe("api client", { concurrency: false }, async () => {
         message: "Hello World!",
         headers: { "x-custom-header": "value" },
       });
+    });
+  });
+
+  it("when performing POST calls", async (t) => {
+    await t.test("can handle objects in payload", async () => {
+      let hello = await unsafe.postBody("http://localhost:8080/", {
+        payload: "Hello World!",
+      });
+      assert.deepStrictEqual(hello?.body, {
+        payload: "Hello World!",
+      });
+      assert.deepStrictEqual(
+        hello?.headers["content-type"],
+        "application/json"
+      );
+    });
+    await t.test("can handle arrays in payload", async () => {
+      let hello = await unsafe.postBody("http://localhost:8080/", [
+        { payload: "Hello World!" },
+      ]);
+      assert.deepStrictEqual(hello?.body, [{ payload: "Hello World!" }]);
+      assert.deepStrictEqual(
+        hello?.headers["content-type"],
+        "application/json"
+      );
+    });
+    await t.test("can handle searchParams in payload", async () => {
+      let qs = new URLSearchParams();
+      qs.append("payload", "Hello World");
+      let hello = await unsafe.postBody("http://localhost:8080/", qs);
+      assert.deepStrictEqual(hello?.body, "payload=Hello+World");
+      assert.match(
+        hello?.headers["content-type"],
+        /application\/x-www-form-urlencoded/
+      );
+    });
+    await t.test("can handle formData in payload", async () => {
+      let qs = new FormData();
+      qs.append("payload", "Hello World");
+      let hello = await unsafe.postBody("http://localhost:8080/", qs);
+      assert.match(hello?.headers["content-type"], /multipart\/form-data/);
     });
   });
 });
