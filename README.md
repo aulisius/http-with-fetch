@@ -1,5 +1,5 @@
 # http-with-fetch
-<a href="https://pkg-size.dev/http-with-fetch"><img src="https://pkg-size.dev/badge/bundle/1213" title="Bundle size for http-with-fetch"></a>
+<a href="https://pkg-size.dev/http-with-fetch"><img src="https://pkg-size.dev/badge/bundle/1283" title="Bundle size for http-with-fetch"></a>
 
 A tiny abstraction over building featureful wrappers over the `fetch` API.
 
