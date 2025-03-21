@@ -7,13 +7,23 @@ type Result<T, Safe extends boolean> = Promise<
 
 export type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
 
+export type RequestDescription = {
+  method: HttpMethod;
+  url: string;
+  qs?: Query;
+  body?: Body;
+  headers?: Headers | Record<string, string>;
+};
+
 interface Client<Safe extends boolean> {
   call<T>(
     method: HttpMethod,
     url: string,
     qs?: Query,
-    body?: Body
+    body?: Body,
+    headers?: Headers | Record<string, string>
   ): Result<T, Safe>;
+  execute<T>(contract: RequestDescription): Result<T, Safe>;
   get<T>(url: string, qs?: Query, body?: Body): Result<T, Safe>;
   post<T>(url: string, qs?: Query, body?: Body): Result<T, Safe>;
   delete<T>(url: string, qs?: Query, body?: Body): Result<T, Safe>;
@@ -133,6 +143,8 @@ export function createApiClient<Safe extends boolean>(
   }
   return {
     call,
+    execute: <T,>(req: RequestDescription) =>
+      call<T>(req.method, req.url, req.qs, req.body, req.headers),
     get: <T,>(url: string, qs: Query, body: Body) =>
       call<T>("GET", url, qs, body),
     post: <T,>(url: string, qs: Query, body: Body) =>

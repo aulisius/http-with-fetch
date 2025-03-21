@@ -122,6 +122,21 @@ await describe("api client", { concurrency: false }, async () => {
     });
   });
 
+  it("when using .execute", async (t) => {
+    await t.test("can use contract objects", async () => {
+      let hello = await unsafe.execute({
+        method: "GET",
+        url: "http://localhost:8080/",
+        qs: { status: 200, message: "Hello World!" },
+        headers: { "x-custom-header": "value" },
+      });
+      assert.deepStrictEqual(hello, {
+        message: "Hello World!",
+        headers: { "x-custom-header": "value" },
+      });
+    });
+  });
+
   it("when performing POST calls", async (t) => {
     await t.test("can handle objects in payload", async () => {
       let hello = await unsafe.postBody("http://localhost:8080/", {
