@@ -1,6 +1,6 @@
 {
   "name": "http-with-fetch",
-  "version": "3.2.1",
+  "version": "3.3.0",
   "module": "lib/client.mjs",
   "source": "src/client.mts",
   "author": {
