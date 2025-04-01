@@ -15,7 +15,7 @@ export type RequestDescription = {
   headers?: Headers | Record<string, string>;
 };
 
-interface Client<Safe extends boolean> {
+export interface Client<Safe extends boolean> {
   call<T>(
     method: HttpMethod,
     url: string,
