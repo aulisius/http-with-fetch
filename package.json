@@ -2,6 +2,9 @@
   "name": "http-with-fetch",
   "version": "3.3.2",
   "type": "module",
+  "exports": {
+    ".": "./lib/client.mjs"
+  },
   "module": "lib/client.mjs",
   "source": "src/client.mts",
   "author": {
