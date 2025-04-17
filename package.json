@@ -1,12 +1,13 @@
 {
   "name": "http-with-fetch",
-  "version": "3.3.3",
+  "version": "3.3.4",
   "type": "module",
   "exports": {
-    ".": "./lib/client.mjs"
+    ".": {
+      "default": "./lib/client.mjs",
+      "types": "./lib/client.d.mts"
+    }
   },
-  "module": "lib/client.mjs",
-  "source": "src/client.mts",
   "author": {
     "name": "N. Md Faizaan",
     "email": "aulisius7@gmail.com"
@@ -22,7 +23,6 @@
     "fetch",
     "http"
   ],
-  "types": "lib/client.d.mts",
   "scripts": {
     "prebuild": "rimraf lib",
     "build": "tsc",
