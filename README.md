@@ -46,3 +46,48 @@ const client = createApiClient({ credentials, visitor }, false);
 
 const list = client.get("/resource", { limit: 10 });
 ```
+
+## Testing with TestHarness
+
+The library includes a `TestHarness` class for mocking HTTP requests in your tests using Node.js's built-in test framework.
+
+Keep in mind, the harness currently only works when use `client.execute`.
+
+```ts
+import { describe, it, test } from "node:test";
+import { TestHarness } from "http-with-fetch/harness";
+import { createApiClient } from "http-with-fetch";
+
+test("should mock API calls", (t) => {
+  const client = createApiClient({ credentials, visitor }, false);
+  
+  // Create a test harness that mocks the client's execute method
+  const harness = new TestHarness(
+    client,
+    t, // test context
+    (req) => {
+      // Default response handler - return mock data based on request
+      if (req.url.includes("/users")) {
+        return { users: [{ id: 1, name: "John" }] };
+      }
+      return { message: "Not found" };
+    }
+  );
+
+  // Now your client calls will use the mocked responses
+  const users = await client.execute({ method: "GET", url: "/users" });
+  console.log(users); // { users: [{ id: 1, name: "John" }] }
+
+  // You can change mock responses for specific test scenarios
+  harness.setMockResponses((req) => {
+    return { error: "Server error" };
+  });
+
+  // Reset to default behavior
+  harness.reset();
+
+  // Access the underlying mock for assertions
+  const mock = harness.getMock();
+  console.log(mock.mock.callCount()); // Number of calls made
+});
+```
