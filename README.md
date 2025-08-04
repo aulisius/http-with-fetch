@@ -47,6 +47,10 @@ const client = createApiClient({ credentials, visitor }, false);
 const list = client.get("/resource", { limit: 10 });
 ```
 
+## API Documentation
+
+For comprehensive API documentation, including all types, interfaces, and methods, see [API.md](./API.md).
+
 ## Testing with TestHarness
 
 The library includes a `TestHarness` class for mocking HTTP requests in your tests using Node.js's built-in test framework.
@@ -54,7 +58,7 @@ The library includes a `TestHarness` class for mocking HTTP requests in your tes
 Keep in mind, the harness currently only works when use `client.execute`.
 
 ```ts
-import { describe, it, test } from "node:test";
+import { test } from "node:test";
 import { TestCredentialsManager, TestHarness } from "http-with-fetch/harness";
 import { createApiClient } from "http-with-fetch";
 

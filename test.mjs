@@ -1,25 +1,11 @@
+import { createApiClient } from "http-with-fetch";
+import { TestCredentialsManager } from "http-with-fetch/harness";
 import assert from "node:assert";
 import { createServer } from "node:http";
 import { describe, it } from "node:test";
-import { createApiClient } from "./lib/client.mjs";
 
-class DefaultCredentialsManager {
-  async attach(init, url) {
-    return { init, url };
-  }
-  async isValid() {
-    return true;
-  }
-}
-
-const credentials = new DefaultCredentialsManager();
-const visitor = {
-  ok: (res) => res.json(),
-  fail: async (req, res) => {
-    const error = await res.json();
-    throw error;
-  },
-};
+const credentials = new TestCredentialsManager();
+const visitor = TestCredentialsManager.Visitor;
 
 const unsafe = createApiClient({ credentials, visitor }, false);
 const safe = createApiClient({ credentials, visitor }, true);
