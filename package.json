@@ -1,11 +1,15 @@
 {
   "name": "http-with-fetch",
-  "version": "3.3.4",
+  "version": "3.3.5",
   "type": "module",
   "exports": {
     ".": {
       "default": "./lib/client.mjs",
       "types": "./lib/client.d.mts"
+    },
+    "./harness": {
+      "default": "./lib/harness.mjs",
+      "types": "./lib/harness.d.mts"
     }
   },
   "author": {
