@@ -30,11 +30,11 @@
     "test": "node --experimental-test-coverage --test test.mjs",
     "prepare": "npm run build"
   },
-  "peerDependencies": {},
   "devDependencies": {
-    "prettier": "3.3.3",
+    "@types/node": "24.1.0",
+    "prettier": "3.6.2",
     "rimraf": "6.0.1",
-    "typescript": "5.5.4"
+    "typescript": "5.9.2"
   },
   "files": [
     "lib/**",
