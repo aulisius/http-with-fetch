@@ -1,5 +1,9 @@
 import type { Mock, TestContext } from "node:test";
-import type { Client, RequestDescription } from "./client.mjs";
+import type {
+  Client,
+  CredentialsManager,
+  RequestDescription,
+} from "./client.mjs";
 
 type ResponseMatcher = (req: RequestDescription) => any;
 
@@ -28,5 +32,22 @@ export class TestHarness<T extends boolean = false> {
 
   getMock() {
     return this.mock;
+  }
+}
+
+export class TestCredentialsManager implements CredentialsManager {
+  public static Visitor = {
+    ok: (res) => res.json(),
+    fail: async (req, res) => {
+      const error = await res.json();
+      throw error;
+    },
+  };
+  async refresh() {}
+  async attach(init: RequestInit, url: string | undefined) {
+    return { init, url };
+  }
+  async isValid() {
+    return true;
   }
 }

@@ -55,11 +55,12 @@ Keep in mind, the harness currently only works when use `client.execute`.
 
 ```ts
 import { describe, it, test } from "node:test";
-import { TestHarness } from "http-with-fetch/harness";
+import { TestCredentialsManager, TestHarness } from "http-with-fetch/harness";
 import { createApiClient } from "http-with-fetch";
 
 test("should mock API calls", (t) => {
-  const client = createApiClient({ credentials, visitor }, false);
+  const credentials = new TestCredentialsManager();
+  const client = createApiClient({ credentials, visitor: TestCredentialsManager.Visitor }, false);
   
   // Create a test harness that mocks the client's execute method
   const harness = new TestHarness(
