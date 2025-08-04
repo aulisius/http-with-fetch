@@ -1,6 +1,6 @@
 {
   "name": "http-with-fetch",
-  "version": "3.3.5",
+  "version": "3.3.6",
   "type": "module",
   "exports": {
     ".": {
